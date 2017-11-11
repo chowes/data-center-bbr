@@ -1,0 +1,7 @@
+blue		target
+blue0[1-5]	target,client
+blue00		target,server
+green0[0-5]	target,client
+red0[0-5]	target,client
+yellow0[0-5]	target,client
+
