@@ -1,5 +1,5 @@
-#ifndef __CHOWES_TCP_UTIL__
-#define __CHOWES_TCP_UTIL__
+#ifndef __CHOWES_TCP_SERVER__
+#define __CHOWES_TCP_SERVER__
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -30,6 +30,14 @@ public:
         connection_socket = fd;
         client_addr = addr;
         pthread_create(&connection_thread, NULL, worker_function, NULL);
+    }
+
+    void Write(void *data) {
+
+    }
+
+    void Read(void *data) {
+
     }
 
     void *Wait() {
