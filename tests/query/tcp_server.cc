@@ -48,12 +48,8 @@ TCPServer::TCPServer() {
         throw "unable to bind socket\n";
     }
 
-    // done with this
     freeaddrinfo(server_info);
-}
 
-
-void TCPServer::Listen() {
     int error = listen(server_accept_socket, MAX_WAITING_CLIENTS);
 
     if (error == -1) {
@@ -98,8 +94,6 @@ void *test(void *args) {
 int main(int argc, char const *argv[])
 {
     TCPServer server;
-
-    server.Listen();
 
     for (int i = 0; i < 10; i++) {
         server.Accept(test);

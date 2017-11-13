@@ -16,30 +16,18 @@ using namespace std;
 
 
 // use this to get an OS assigned port
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
+#include <arpa/inet.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <pthread.h>
+
 #define PORTNUM                     "11235"
 
-
-class TCPConnection {
-    int connection_socket;
-    struct sockaddr_in client_addr;
-    pthread_t connection_thread;
-
-public:
-    TCPConnection(int fd, sockaddr_in addr, void *(*worker_function)(void *)) {
-        connection_socket = fd;
-        client_addr = addr;
-        pthread_create(&connection_thread, NULL, worker_function, NULL);
-    }
-
-    void *Wait() {
-        pthread_join(connection_thread, NULL);
-        return NULL;
-    }
-
-    void Close() {
-        close(connection_socket);
-    }
-};
+using namespace std;
 
 
 class TCPClient {
@@ -47,23 +35,24 @@ class TCPClient {
 public:
 
     /*
-     * constructor - create a TCPServer and bind to a port (see PORTNUM)
+     * constructor - connect to a server (see PORTNUM)
      * 
      * on success, we store a socket descriptor in socket_fd
      */
-    TCPServer();
+    TCPClient(const string hostname);
 
-    // Listen
-    void Listen();
+    // send data
+    int Send(const void *data, size_t sz);
 
-    // Accept
-    int Accept(void *(*func)(void *));
+    // receive data
+    int Receive(void *data, size_t sz);
 
-    void Stop();
+    // close the connection
+    void Close();
 
 private:
-    int server_accept_socket;
-    vector<TCPConnection> connected_clients;
+    int client_socket;
+    struct sockaddr_in server_addr;
 };
 
 

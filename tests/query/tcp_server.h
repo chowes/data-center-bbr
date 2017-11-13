@@ -32,11 +32,11 @@ public:
         pthread_create(&connection_thread, NULL, worker_function, NULL);
     }
 
-    void Write(void *data) {
+    int Send(const void *data, size_t sz) {
 
     }
 
-    void Read(void *data) {
+    int Receive(void *data, size_t sz) {
 
     }
 
@@ -58,16 +58,22 @@ public:
     /*
      * constructor - create a TCPServer and bind to a port (see PORTNUM)
      * 
-     * on success, we store a socket descriptor in socket_fd
+     * on success, we store a socket descriptor in socket_fd and listen for
+     * incoming connections
      */
     TCPServer();
 
-    // Listen
-    void Listen();
-
-    // Accept
+    /*
+     * accept an incoming connection and createa new worker thread
+     *
+     * each new connection is added to connected_clients, we can wait on these 
+     * threads by calling stop
+     */
     int Accept(void *(*func)(void *));
 
+    /*
+     * wait for our worker threads to finish and close all connections
+     */
     void Stop();
 
 private:
