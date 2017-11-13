@@ -40,7 +40,6 @@ void *send_queries(void *conn) {
     int bytes = 0; 
     while (bytes < total_bytes / num_workers) {
         bytes += connection->Receive(response, total_bytes / num_workers);
-        cerr << bytes << endl;
         break;
     }
 
@@ -78,7 +77,6 @@ int main(int argc, char const *argv[])
 
     total_time = time_diff(t1, t2); // avoid dividing by 0
     fprintf(stdout, "server responded in %ld usecs\n", total_time);
-
 
     server.Stop();
 

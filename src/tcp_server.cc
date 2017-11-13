@@ -152,7 +152,6 @@ void TCPServer::WaitAll() {
 
 void TCPServer::Stop() {
     for (TCPConnection *conn : connected_clients) {
-        conn->Wait();
         conn->Close();
     }
 }
