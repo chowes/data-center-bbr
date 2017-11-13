@@ -1,6 +1,6 @@
-blue0[1-5]	target,client
-blue00		target,server
-green0[0-5]	target,client
-red0[0-5]	target,client
-yellow0[0-5]	target,client
+blue0[1-5]	target,sender
+blue00		target,receiver
+green0[0-5]	target,sender
+red0[0-5]	target,sender
+yellow0[0-5]	target,sender
 

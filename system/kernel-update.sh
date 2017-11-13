@@ -5,8 +5,7 @@ if ! [ $(id -u) = 0 ]; then
 	exit 1
 fi
 
-
-echo "Compiling..."
+# do this first manually...
 # make -j 12 -C /home/chowes/linux-4.13.10/
 
 echo "Installing modules..."
