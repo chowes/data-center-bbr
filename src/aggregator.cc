@@ -53,6 +53,7 @@ int main(int argc, char const *argv[])
 {
     TCPServer server;
     long num_workers;
+    long total_bytes;
     long total_time;
     struct timespec t1, t2;
 
@@ -64,6 +65,7 @@ int main(int argc, char const *argv[])
     }
 
     num_workers = strtol(argv[1], NULL, 10);
+    total_bytes = strtol(argv[2], NULL, 10);
 
     for (int i = 0; i < num_workers; i++) {
         server.Accept();
