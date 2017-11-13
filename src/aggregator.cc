@@ -40,7 +40,6 @@ void *send_queries(void *conn) {
     int bytes = 0; 
     while (bytes < total_bytes / num_workers) {
         bytes += connection->Receive(response, total_bytes / num_workers);
-        break;
     }
 
     cout << "received bytes from worker: " << bytes << endl;
