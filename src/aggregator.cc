@@ -9,7 +9,7 @@ void *send_queries(void *conn) {
     long num_workers = stol(args[1]);
     long total_bytes = stol(args[2]);
 
-    string query_message = to_string(total_bytes / num_workers);
+    string query_message = "throughput " + to_string(total_bytes / num_workers) + " " + to_string(0);
     char *response = new char[total_bytes / num_workers];
 
     connection->Send(query_message.c_str(), query_message.size());
@@ -18,9 +18,10 @@ void *send_queries(void *conn) {
     while (bytes < total_bytes / num_workers) {
         bytes += connection->Receive(response, total_bytes / num_workers);
         cerr << bytes << endl;
+        break;
     }
 
-    cout << response << ": " << bytes << endl;
+    cout << "received bytes from worker: " << bytes << endl;
 
     return NULL;
 }
