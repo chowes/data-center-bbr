@@ -15,4 +15,4 @@ worker: worker.o tcp_client.o
 	$(CXX) $^ $(LDFLAGS) -o $@
 
 clean:
-	rm -f *.o tcp_client tcp_server
+	rm -f *.o aggregator worker
