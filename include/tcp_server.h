@@ -75,10 +75,18 @@ public:
 
     void StartWorkers(void *(*func)(void *), const char *args[]);
 
+
+    /*
+     * wait for all worker threads to finish
+     */
+    void WaitAll();
+
+
     /*
      * wait for our worker threads to finish and close all connections
      */
     void Stop();
+
 
 private:
     int server_accept_socket;

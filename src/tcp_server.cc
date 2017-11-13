@@ -143,6 +143,13 @@ void TCPServer::StartWorkers(void *(*func)(void *), const char *argv[]) {
 }
 
 
+void TCPServer::WaitAll() {
+    for (TCPConnection *conn : connected_clients) {
+        conn->Wait();
+    }
+}
+
+
 void TCPServer::Stop() {
     for (TCPConnection *conn : connected_clients) {
         conn->Wait();
