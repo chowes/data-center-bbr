@@ -1,6 +1,7 @@
 #include <time.h>
 
 #include <iostream>
+#include <fstream>
 
 #include "tcp_server.h"
 
@@ -55,6 +56,8 @@ int main(int argc, char const *argv[])
     long total_time;
     struct timespec t1, t2;
 
+    ofstream results_file;
+
     if (argc < 3) {
         cerr << "usage: aggregator <num workers> <total bytes>" << endl;
         exit(1);
@@ -74,8 +77,11 @@ int main(int argc, char const *argv[])
 
     clock_gettime(CLOCK_MONOTONIC, &t2);
 
-    total_time = time_diff(t1, t2); // avoid dividing by 0
-    fprintf(stdout, "server responded in %ld usecs\n", total_time);
+    total_time = time_diff(t1, t2);
+    fprintf(stdout, "got response from workers in %ld usecs\n", total_time);
+    
+    results_file.open("query_results.txt");
+    results_file << num_workers << "," << total_time << endl;
 
     server.Stop();
 
