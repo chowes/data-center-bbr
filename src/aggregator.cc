@@ -1,4 +1,6 @@
 #include <time.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #include <iostream>
 #include <fstream>
@@ -30,8 +32,8 @@ void *send_queries(void *conn) {
     TCPConnection *connection = static_cast<TCPConnection *>(conn);
     vector<string> args = connection->GetArgs();
 
-    long num_workers = stol(args[1]);
-    long total_bytes = stol(args[2]);
+    long num_workers = stol(args[2]);
+    long total_bytes = stol(args[3]);
 
     string query_message = "query " + to_string(total_bytes / num_workers);
     char *response = new char[total_bytes / num_workers];
@@ -49,8 +51,36 @@ void *send_queries(void *conn) {
 }
 
 
-int main(int argc, char const *argv[])
-{
+void *start_iperf(void *conn) {
+    TCPConnection *connection = static_cast<TCPConnection *>(conn);
+    vector<string> args = connection->GetArgs();
+
+    vector<char*> iperf_argv;
+    char *arg = new char[strlen("-c")];
+    strcpy(arg, "-c");
+    iperf_argv.push_back(arg);
+    for (int i = 2; i < args.size(); i++) {
+        char *arg = new char[args[i].size()];
+        strcpy(arg, args[i].c_str()); 
+        iperf_argv.push_back(arg);
+    }
+    iperf_argv.push_back(NULL);
+
+    int status;
+
+    pid_t pid = fork();
+    if (pid == 0) {
+        execv("iperf", &iperf_argv[0]);
+    } else {
+        waitpid(pid, &status, 0);
+    }
+
+    return NULL;
+}
+
+
+int query_server(int argc, char const *argv[]) {
+
     TCPServer server;
     long num_workers;
     long total_bytes;
@@ -59,9 +89,9 @@ int main(int argc, char const *argv[])
 
     ofstream results_file;
 
-    if (argc < 3) {
-        cerr << "usage: aggregator <num workers> <total bytes>" << endl;
-        exit(1);
+    if (argc < 4) {
+        cerr << "usage: aggregator test <args ...>" << endl;
+        return -1;
     }
 
     num_workers = strtol(argv[1], NULL, 10);
@@ -88,4 +118,32 @@ int main(int argc, char const *argv[])
     server.Stop();
 
     return 0;
+}
+
+
+int throughput_server(int argc, char const *argv[]) {
+    return 0;
+}
+
+
+int main(int argc, char const *argv[])
+{
+    TCPServer server;
+    long num_workers;
+    long total_bytes;
+    long total_time;
+    struct timespec t1, t2;
+
+    if (argc < 2) {
+        cerr << "usage: aggregator test <args ...>" << endl;
+        exit(1);
+    }
+
+    string test_type = argv[1];
+
+    if (test_type == "query") {
+        return query_server(argc, argv);
+    } else if (test_type == "throughput") {
+        return throughput_server(argc, argv);
+    }
 }

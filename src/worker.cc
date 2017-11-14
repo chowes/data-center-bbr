@@ -27,15 +27,7 @@ int query_test(TCPClient &client, long query_size)
 
 int throughput_test(TCPClient &client, long duration, long delay)
 {
-    cout << "throughput test - duration: " << duration << " delay: " << delay << endl;
-
-    char *msg = new char[MESSAGE_SZ];
-    memset(msg, '%', MESSAGE_SZ);
-
-    client.Send(msg, MESSAGE_SZ);
-
-    delete msg;
-
+    
     return 0;
 }
 
