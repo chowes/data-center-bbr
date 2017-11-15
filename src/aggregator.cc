@@ -103,7 +103,7 @@ int query_server(int argc, char const *argv[]) {
     total_time = time_diff(t1, t2);
     fprintf(stdout, "got response from workers in %ld usecs\n", total_time);
     
-    results_file.open("query_results.txt", ios::app);
+    results_file.open(results_path, ios::app);
     results_file << num_workers << "," << total_bytes << "," << total_time << endl;
 
     server.Stop();
