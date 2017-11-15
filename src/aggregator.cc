@@ -57,7 +57,12 @@ void *start_iperf(void *conn) {
     TCPConnection *connection = static_cast<TCPConnection *>(conn);
     vector<string> args = connection->GetArgs();
 
+    string server_hostname = args[2];
+    long total_time = stol(args[4]);
 
+    string throughput_message = "throughput " + to_string(total_time);
+
+    connection->Send(throughput_message.c_str(), throughput_message.size());
 
     return NULL;
 }
@@ -116,7 +121,7 @@ int throughput_server(int argc, char const *argv[]) {
     long total_time;
     double interval;
 
-    if (argc < 5) {
+    if (argc < 7) {
         cerr << "usage: aggregator throughput <num flows> <delay> <total time> <interval> <results file>" << endl;
         return -1;
     }
@@ -127,10 +132,9 @@ int throughput_server(int argc, char const *argv[]) {
     interval = atof(argv[5]);
     results_path = string(argv[6]);
 
-    // for (int i = 0; i < num_flows; i++) {
-    //     server.Accept();
-    // }
-
+    for (int i = 0; i < num_flows; i++) {
+        server.Accept();
+    }
 
     // create argument vector for iperf arguments
     // iperf -s -t <client timeout + e> -y c -i <interval> -o <results file>
@@ -151,8 +155,8 @@ int throughput_server(int argc, char const *argv[]) {
     strcpy(iperf_argv[5], to_string(interval).c_str());
     iperf_argv[6] = new char[strlen("-y")];
     strcpy(iperf_argv[6], "-y");
-    iperf_argv[7] = new char[strlen("c")];
-    strcpy(iperf_argv[7], "c");
+    iperf_argv[7] = new char[strlen("a")];
+    strcpy(iperf_argv[7], "a");
     iperf_argv[8] = NULL;
 
 
@@ -160,17 +164,27 @@ int throughput_server(int argc, char const *argv[]) {
 
     pid_t pid = fork();
     if (pid == 0) {
-        // since iperf is a piece of garbage we have to redirect stdout
+        // since iperf doesn't output to file properly we have to redirect stdout
         int fd = open(results_path.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
         dup2(fd, 1);
         close(fd);
 
         execv("/usr/bin/iperf", iperf_argv);
+
         // we should never get here...
         perror("execv");
-        
+        exit(1);
     } else {
+        
+        // we don't want to do this until the server starts, but i can't think of a good way to signal this...
+        sleep(1);
+
+        server.StartWorkers(start_iperf, argv);
         waitpid(pid, &status, 0);
+
+        for (int i = 0; iperf_argv[i] != NULL; i++) {
+            delete iperf_argv[i];
+        }
     }
 
     return 0;
