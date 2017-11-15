@@ -168,6 +168,7 @@ int throughput_server(int argc, char const *argv[]) {
         execv("/usr/bin/iperf", iperf_argv);
         // we should never get here...
         perror("execv");
+        
     } else {
         waitpid(pid, &status, 0);
     }
