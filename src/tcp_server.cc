@@ -85,17 +85,19 @@ TCPServer::TCPServer() {
 
     // we need to traverse the list of addrinfo structs until one is valid
     for (ai_iter = server_info; ai_iter != NULL; ai_iter = ai_iter->ai_next) {
-
+        
         // get a socket file descriptor
         server_accept_socket = socket(ai_iter->ai_family, ai_iter->ai_socktype, 
             ai_iter->ai_protocol);
 
         if (server_accept_socket == -1) {
+            perror("socket");
             continue;
         }
 
         // bind a port to our socket descriptor
         if (bind(server_accept_socket, ai_iter->ai_addr, ai_iter->ai_addrlen) == -1) {
+            perror("bind");
             close(server_accept_socket);
             continue;
         }

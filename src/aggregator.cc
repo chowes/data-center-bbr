@@ -1,6 +1,8 @@
 #include <time.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include <iostream>
 #include <fstream>
@@ -125,55 +127,50 @@ int throughput_server(int argc, char const *argv[]) {
     interval = atof(argv[5]);
     results_path = string(argv[6]);
 
-    for (int i = 0; i < num_flows; i++) {
-        server.Accept();
-    }
+    // for (int i = 0; i < num_flows; i++) {
+    //     server.Accept();
+    // }
 
 
     // create argument vector for iperf arguments
     // iperf -s -t <client timeout + e> -y c -i <interval> -o <results file>
 
-    vector<char*> iperf_argv;
-    char *arg = new char[strlen("-%")];
-    char *val = new char[256];
-    
-    strcpy(arg, "-s");
-    iperf_argv.push_back(arg);
+    char *iperf_argv[10];
 
-    strcpy(arg, "-t");
-    iperf_argv.push_back(arg);
-    strcpy(val, to_string(total_time).c_str());
-    iperf_argv.push_back(val);
-
-    strcpy(arg, "-y");
-    iperf_argv.push_back(arg);
-    strcpy(arg, "c");
-    iperf_argv.push_back(arg);
-
-    strcpy(arg, "-i");
-    iperf_argv.push_back(arg);
-    strcpy(val, to_string(interval).c_str());
-    iperf_argv.push_back(val);
-
-    strcpy(arg, "-o");
-    iperf_argv.push_back(arg);
-    strcpy(val, results_path.c_str());
-    iperf_argv.push_back(val);
-
-    iperf_argv.push_back(NULL);
+    iperf_argv[0] = new char[strlen("iperf")];
+    strcpy(iperf_argv[0], "iperf");
+    iperf_argv[1] = new char[strlen("-s")];
+    strcpy(iperf_argv[1], "-s");
+    iperf_argv[2] = new char[strlen("-t")];
+    strcpy(iperf_argv[2], "-t");
+    iperf_argv[3] = new char[strlen(to_string(total_time).c_str())];
+    strcpy(iperf_argv[3], to_string(total_time).c_str());
+    iperf_argv[4] = new char[strlen("-i")];
+    strcpy(iperf_argv[4], "-i");
+    iperf_argv[5] = new char[strlen(to_string(interval).c_str())];
+    strcpy(iperf_argv[5], to_string(interval).c_str());
+    iperf_argv[6] = new char[strlen("-y")];
+    strcpy(iperf_argv[6], "-y");
+    iperf_argv[7] = new char[strlen("c")];
+    strcpy(iperf_argv[7], "c");
+    iperf_argv[8] = NULL;
 
 
     int status;
 
     pid_t pid = fork();
     if (pid == 0) {
-        execv("iperf", &iperf_argv[0]);
+        // since iperf is a piece of garbage we have to redirect stdout
+        int fd = open(results_path.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+        dup2(fd, 1);
+        close(fd);
+
+        execv("/usr/bin/iperf", iperf_argv);
+        // we should never get here...
+        perror("execv");
     } else {
         waitpid(pid, &status, 0);
     }
-
-    delete val;
-    delete arg;
 
     return 0;
 }
@@ -181,12 +178,6 @@ int throughput_server(int argc, char const *argv[]) {
 
 int main(int argc, char const *argv[])
 {
-    TCPServer server;
-    long num_workers;
-    long total_bytes;
-    long total_time;
-    struct timespec t1, t2;
-
     if (argc < 2) {
         cerr << "usage: aggregator test <args ...>" << endl;
         exit(1);
