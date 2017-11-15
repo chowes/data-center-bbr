@@ -55,25 +55,7 @@ void *start_iperf(void *conn) {
     TCPConnection *connection = static_cast<TCPConnection *>(conn);
     vector<string> args = connection->GetArgs();
 
-    vector<char*> iperf_argv;
-    char *arg = new char[strlen("-c")];
-    strcpy(arg, "-c");
-    iperf_argv.push_back(arg);
-    for (int i = 2; i < args.size(); i++) {
-        char *arg = new char[args[i].size()];
-        strcpy(arg, args[i].c_str()); 
-        iperf_argv.push_back(arg);
-    }
-    iperf_argv.push_back(NULL);
 
-    int status;
-
-    pid_t pid = fork();
-    if (pid == 0) {
-        execv("iperf", &iperf_argv[0]);
-    } else {
-        waitpid(pid, &status, 0);
-    }
 
     return NULL;
 }
@@ -85,17 +67,19 @@ int query_server(int argc, char const *argv[]) {
     long num_workers;
     long total_bytes;
     long total_time;
+    string results_path;
     struct timespec t1, t2;
 
     ofstream results_file;
 
     if (argc < 4) {
-        cerr << "usage: aggregator test <args ...>" << endl;
+        cerr << "usage: aggregator query <num workers> <total request size (bytes)> <results_file>" << endl;
         return -1;
     }
 
-    num_workers = strtol(argv[1], NULL, 10);
-    total_bytes = strtol(argv[2], NULL, 10);
+    num_workers = strtol(argv[2], NULL, 10);
+    total_bytes = strtol(argv[3], NULL, 10);
+    results_path = string(argv[4]);
 
     for (int i = 0; i < num_workers; i++) {
         server.Accept();
@@ -122,6 +106,75 @@ int query_server(int argc, char const *argv[]) {
 
 
 int throughput_server(int argc, char const *argv[]) {
+
+    TCPServer server;
+    string results_path;
+    long num_flows;
+    long delay;
+    long total_time;
+    double interval;
+
+    if (argc < 5) {
+        cerr << "usage: aggregator throughput <num flows> <delay> <total time> <interval> <results file>" << endl;
+        return -1;
+    }
+
+    num_flows = strtol(argv[2], NULL, 10);
+    delay = strtol(argv[3], NULL, 10);    
+    total_time = strtol(argv[4], NULL, 10);
+    interval = atof(argv[5]);
+    results_path = string(argv[6]);
+
+    for (int i = 0; i < num_flows; i++) {
+        server.Accept();
+    }
+
+
+    // create argument vector for iperf arguments
+    // iperf -s -t <client timeout + e> -y c -i <interval> -o <results file>
+
+    vector<char*> iperf_argv;
+    char *arg = new char[strlen("-%")];
+    char *val = new char[256];
+    
+    strcpy(arg, "-s");
+    iperf_argv.push_back(arg);
+
+    strcpy(arg, "-t");
+    iperf_argv.push_back(arg);
+    strcpy(val, to_string(total_time).c_str());
+    iperf_argv.push_back(val);
+
+    strcpy(arg, "-y");
+    iperf_argv.push_back(arg);
+    strcpy(arg, "c");
+    iperf_argv.push_back(arg);
+
+    strcpy(arg, "-i");
+    iperf_argv.push_back(arg);
+    strcpy(val, to_string(interval).c_str());
+    iperf_argv.push_back(val);
+
+    strcpy(arg, "-o");
+    iperf_argv.push_back(arg);
+    strcpy(val, results_path.c_str());
+    iperf_argv.push_back(val);
+
+    iperf_argv.push_back(NULL);
+
+
+    int status;
+
+    pid_t pid = fork();
+    if (pid == 0) {
+        execv("iperf", &iperf_argv[0]);
+    } else {
+        waitpid(pid, &status, 0);
+    }
+
+    delete val;
+    delete arg;
+
     return 0;
 }
 

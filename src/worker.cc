@@ -25,7 +25,7 @@ int query_test(TCPClient &client, long query_size)
 }
 
 
-int throughput_test(TCPClient &client, long duration, long delay)
+int throughput_test(TCPClient &client, string hostname, long duration)
 {
     
     return 0;
@@ -57,19 +57,28 @@ int main(int argc, char const *argv[])
         test_info.push_back(buf);
     }
 
-    for (string s : test_info) {
-        cout << s << endl;
+    if (test_info.size() < 1) {
+        cerr << "fatal: empty request from server" << endl;
+        exit(1);        
     }
-
 
     string test_type = test_info[0];
 
     if (test_type == "query") {
+        if (test_info.size() < 2) {
+            cerr << "fatal: too few arguments from server" << endl;
+            exit(1);
+        }
         long query_size = stol(test_info[1]);
         query_test(client, query_size);
     } else if (test_type == "throughput") {
+        if (test_info.size() < 4) {
+            cerr << "fatal: too few arguments from server" << endl;
+            exit(1);
+        }
         long duration = stol(test_info[1]);
-        long delay = stol(test_info[2]);
+        string server_hostname = string(test_info[2]);
+        throughput_test(client, server_hostname, duration);
     } else {
         cerr << "fatal: server requested invalid test type" << endl;
         exit(1);
