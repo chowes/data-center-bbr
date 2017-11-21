@@ -155,8 +155,8 @@ int throughput_server(int argc, char const *argv[]) {
     strcpy(iperf_argv[5], to_string(interval).c_str());
     iperf_argv[6] = new char[strlen("-y")];
     strcpy(iperf_argv[6], "-y");
-    iperf_argv[7] = new char[strlen("a")];
-    strcpy(iperf_argv[7], "a");
+    iperf_argv[7] = new char[strlen("c")];
+    strcpy(iperf_argv[7], "c");
     iperf_argv[8] = NULL;
 
 
@@ -165,7 +165,7 @@ int throughput_server(int argc, char const *argv[]) {
     pid_t pid = fork();
     if (pid == 0) {
         // since iperf doesn't output to file properly we have to redirect stdout
-        int fd = open(results_path.c_str(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
+        int fd = open(results_path.c_str(), O_RDWR | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR);
         dup2(fd, 1);
         close(fd);
 

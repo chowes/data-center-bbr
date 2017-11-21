@@ -7,11 +7,15 @@ mb_size=1048576
 
 for (( i = 1; i <= 20; i++ )); do
 
-	echo pdsh -w $aggregator /home/chowes/data-center-bbr/aggregator throughput $i 0 30 .1 "throughput_test_"$cong_ctl"_"$i".csv"
+	# create a results file template
+	filename="results/throughput/throughput_test_"$cong_ctl"_"$i".csv"
+	cp results/throughput/iperf_template.csv $filename
+
+	# start the aggregator
+	pdsh -w $aggregator /home/chowes/data-center-bbr/aggregator throughput $i 0 30 .1 $filename
 
 
 	# build the worker list
-
 	worker_list=""
 	# read the first i worker nodes from file
 	input="./nodes"
@@ -19,11 +23,9 @@ for (( i = 1; i <= 20; i++ )); do
 		read -r line
 		worker_list+="$line"
 		worker_list+=","
-		echo $worker_list
 	done < "$input"
 
 	
-	# start each worker
-
-	echo pdsh -w $worker_list /home/chowes/data-center-bbr/worker $aggregator
+	# start the workers
+	pdsh -w $worker_list /home/chowes/data-center-bbr/worker $aggregator
 done
