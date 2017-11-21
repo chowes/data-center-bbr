@@ -5,15 +5,10 @@ if ! [ $(id -u) = 0 ]; then
 	exit 1
 fi
 
-# do this first manually...
-# make -j 12 -C /home/chowes/linux-4.13.10/
+dpkg -i /home/chowes/linux-headers-4.13.0-041300_4.13.0-041300.201709031731_all.deb
+dpkg -i /home/chowes/linux-headers-4.13.0-041300-generic_4.13.0-041300.201709031731_amd64.deb
+dpkg -i /home/chowes/linux-image-4.13.0-041300-generic_4.13.0-041300.201709031731_amd64.deb
 
-echo "Installing modules..."
-make -j 12 -C /home/chowes/linux-4.13.10/ modules_install
-
-echo "Installing new kernel..."
-make -j 12 -C /home/chowes/linux-4.13.10/ install
-update-initramfs -c -k 4.13.10
 update-grub
 
 echo "Rebooting into new kernel..."
