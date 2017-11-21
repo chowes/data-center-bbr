@@ -5,7 +5,7 @@ cong_ctl=$1
 aggregator="blue00"
 mb_size=1048576
 
-for (( i = 1; i <= 20; i++ )); do
+for (( i = 1; i <= 1; i++ )); do
 	for ((j = 0; j < 10; j++)); do
 		
 		# start the aggregator

@@ -8,8 +8,8 @@ mb_size=1048576
 for (( i = 1; i <= 20; i++ )); do
 
 	# create a results file template
-	filename="results/throughput/throughput_test_"$cong_ctl"_"$i".csv"
-	cp results/throughput/iperf_template.csv $filename
+	filename="/home/chowes/data-center-bbr/results/throughput/throughput_test_"$cong_ctl"_"$i".csv"
+	cp /home/chowes/data-center-bbr/results/throughput/iperf_template.csv $filename
 
 	# start the aggregator
 	pdsh -w $aggregator /home/chowes/data-center-bbr/aggregator throughput $i 0 30 .1 $filename
