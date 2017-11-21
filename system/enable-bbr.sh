@@ -8,7 +8,5 @@ fi
 echo "Enabling TCP BBR module"
 
 modprobe tcp_bbr
-
-echo "Rebooting into new kernel..."
-reboot
+sysctl --system
 
