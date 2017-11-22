@@ -12,7 +12,6 @@ for (( i = 1; i <= 20; i++ )); do
 	cp /home/chowes/data-center-bbr/results/throughput/iperf_template.csv $filename
 
 	# start the aggregator
-	pdsh -w $aggregator /home/chowes/data-center-bbr/aggregator throughput $i 0 30 .1 $filename
 
 
 	# build the worker list
@@ -27,5 +26,8 @@ for (( i = 1; i <= 20; i++ )); do
 
 	
 	# start the workers
+	pdsh -w $aggregator /home/chowes/data-center-bbr/aggregator throughput $i 0 30 .1 $filename
+	sleep 3
 	pdsh -w $worker_list /home/chowes/data-center-bbr/worker $aggregator
+	sleep 3
 done
