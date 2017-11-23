@@ -138,8 +138,11 @@ int TCPServer::Accept() {
 }
 
 
-void TCPServer::StartWorkers(void *(*func)(void *), const char *argv[]) {
+void TCPServer::StartWorkers(void *(*func)(void *), const char *argv[], int delay) {
     for (TCPConnection *conn : connected_clients) {
+        if (delay != 0) {
+            sleep(delay);
+        }
         conn->Start(func, argv);
     }
 }
