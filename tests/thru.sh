@@ -26,8 +26,8 @@ for (( i = 1; i <= 20; i++ )); do
 
 	
 	# start the workers
-	pdsh -w $aggregator /home/chowes/data-center-bbr/aggregator throughput $i 0 30 .1 $filename
+	pdsh -w $aggregator /home/chowes/data-center-bbr/aggregator throughput $i 0 30 .1 $filename&
 	sleep 3
 	pdsh -w $worker_list /home/chowes/data-center-bbr/worker $aggregator
-	sleep 3
+	sleep 40
 done
