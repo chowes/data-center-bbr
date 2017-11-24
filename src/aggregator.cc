@@ -47,8 +47,6 @@ long calc_throughput(struct timespec t1, struct timespec t2, long bytes)
 
     long bytes_per_usec = bytes / usecs;
 
-    cerr << usecs << " " << bytes_per_usec << endl;
-
     return bytes_per_usec * (USECS_PER_SEC / BYTES_PER_MBIT);
 }
 
@@ -96,8 +94,6 @@ void *start_senders(void *conn)
     char *response = new char[MSG_SIZE];
 
     string throughput_message = "throughput " + to_string(total_time);
-
-    cerr << throughput_message << endl;
 
     connection->Send(throughput_message.c_str(), throughput_message.size());
 
@@ -162,7 +158,7 @@ void timer_sighandler(union sigval val)
     
     for (auto &tp : flow_throughput) {
         long &previous = flow_previous.at(tp.first);
-        cout << tp.first << ": " << calc_throughput(prev_time, curr_time, tp.second - previous) << endl;
+        cout << tp.first << ": " << calc_throughput(prev_time, curr_time, tp.second - previous) << " Mbits/s" << endl;
         previous = tp.second;
     }
     
