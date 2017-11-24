@@ -1,0 +1,4 @@
+num_workers,query_size,response_time
+1,1048576,9989
+2,1048576,9460
+3,1048576,9528
