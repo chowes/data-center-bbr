@@ -14,11 +14,13 @@
 #define NSECS_PER_SEC       1000000000
 #define USECS_PER_SEC       1000000
 #define NSECS_PER_USEC      1000
-#define MBITS_PER_BYTE      125000
+#define BYTES_PER_MBIT      125000
 
 // keep a hash table of the bytes transfered by flow (lookup is by socket descriptor)
 pthread_mutex_t flow_throughput_mutex = PTHREAD_MUTEX_INITIALIZER;
 unordered_map<int, long> flow_throughput;
+unordered_map<int, long> flow_previous;
+struct timespec prev_time;
 
 struct itimerspec timer_setting;
 
@@ -35,6 +37,19 @@ long time_diff(struct timespec t1, struct timespec t2)
     usecs = (secs * USECS_PER_SEC) + (nsecs / NSECS_PER_USEC);
 
     return usecs;
+}
+
+
+long calc_throughput(struct timespec t1, struct timespec t2, long bytes)
+{
+    long usecs = time_diff(t1, t2);
+    long mbits = bytes / BYTES_PER_MBIT;
+
+    long bytes_per_usec = bytes / usecs;
+
+    cerr << usecs << " " << bytes_per_usec << endl;
+
+    return bytes_per_usec * (USECS_PER_SEC / BYTES_PER_MBIT);
 }
 
 
@@ -74,6 +89,7 @@ void *start_senders(void *conn)
     // we should only need to lock and unlock here since each thread only modifies its own count via reference
     pthread_mutex_lock(&flow_throughput_mutex);
     flow_throughput.emplace(connection->GetSocket(), 0);
+    flow_previous.emplace(connection->GetSocket(), 0);
     auto &throughput_counter = flow_throughput.at(connection->GetSocket());
     pthread_mutex_unlock(&flow_throughput_mutex);
 
@@ -140,9 +156,17 @@ int query_server(int argc, char const *argv[])
 
 void timer_sighandler(union sigval val)
 {
+    struct timespec curr_time;
+    clock_gettime(CLOCK_MONOTONIC, &curr_time);
+    long real_interval = time_diff(prev_time, curr_time);
+    
     for (auto &tp : flow_throughput) {
-        cout << tp.first << ": " << tp.second << endl;
+        long &previous = flow_previous.at(tp.first);
+        cout << tp.first << ": " << calc_throughput(prev_time, curr_time, tp.second - previous) << endl;
+        previous = tp.second;
     }
+    
+    clock_gettime(CLOCK_MONOTONIC, &prev_time);
 }
 
 
@@ -198,7 +222,9 @@ int throughput_server(int argc, char const *argv[])
     }
 
     // start the timer
+    clock_gettime(CLOCK_MONOTONIC, &prev_time);
     status = timer_settime(timer_id, 0, &timer_setting, NULL);
+
 
     // start receiving data
     server.StartWorkers(start_senders, argv, 0);
