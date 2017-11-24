@@ -9,7 +9,7 @@ filename="/home/chowes/data-center-bbr/tests/results/query/query_"$cong_ctl".csv
 cp "/home/chowes/data-center-bbr/tests/results/query/query_template.csv" $filename
 
 for (( i = 1; i <= 20; i++ )); do
-	for ((j = 0; j < 100; j++)); do
+	for ((j = 0; j < 1; j++)); do
 		
 		# build the worker list
 		worker_list=""
