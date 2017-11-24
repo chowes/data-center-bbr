@@ -24,6 +24,12 @@ vector<string> TCPConnection::GetArgs() {
 }
 
 
+int TCPConnection::GetSocket() {
+    return connection_socket;
+}
+
+
+
 int TCPConnection::Send(const void *data, size_t sz) {
     int bytes_sent;
 
@@ -140,10 +146,10 @@ int TCPServer::Accept() {
 
 void TCPServer::StartWorkers(void *(*func)(void *), const char *argv[], int delay) {
     for (TCPConnection *conn : connected_clients) {
+        conn->Start(func, argv);
         if (delay != 0) {
             sleep(delay);
         }
-        conn->Start(func, argv);
     }
 }
 

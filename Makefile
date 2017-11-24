@@ -1,6 +1,6 @@
 CXX = g++
 CXXFLAGS += -std=c++11 -Iinclude -g
-LDFLAGS += -lpthread
+LDFLAGS += -lpthread -lrt
 
 SRC_PATH = src
 vpath %.cc $(SRC_PATH)

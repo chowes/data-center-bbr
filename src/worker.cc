@@ -26,40 +26,18 @@ int query_test(TCPClient &client, long query_size)
 }
 
 
-int throughput_test(TCPClient &client, string hostname, long duration)
+int throughput_test(TCPClient &client, long duration)
 {
-    char *iperf_argv[6];
-
-    iperf_argv[0] = new char[strlen("iperf")];
-    strcpy(iperf_argv[0], "iperf");
-    iperf_argv[1] = new char[strlen("-c")];
-    strcpy(iperf_argv[1], "-c");
-    iperf_argv[2] = new char[strlen(hostname.c_str())];
-    strcpy(iperf_argv[2], hostname.c_str());
-    iperf_argv[3] = new char[strlen("-t")];
-    strcpy(iperf_argv[3], "-t");
-    iperf_argv[4] = new char[strlen(to_string(duration).c_str())];
-    strcpy(iperf_argv[4], to_string(duration).c_str());
-    iperf_argv[5] = NULL;
-
-
-
     int status;
 
-    pid_t pid = fork();
-    if (pid == 0) {
-        execv("/usr/bin/iperf", iperf_argv);
+    char *msg = new char[MSG_SIZE];
+    memset(msg, '%', MSG_SIZE);
 
-        // we should never get here...
-        perror("execv");
-        exit(1);
-    } else {
-        waitpid(pid, &status, 0);
-    
-        for (int i = 0; iperf_argv[i] != NULL; i++) {
-            delete iperf_argv[i];
-        }
+    // start timer and do until duration expires
+    while (send) {
+        client.Send(msg, MSG_SIZE);
     }
+
     return 0;
 }
 
@@ -108,9 +86,8 @@ int main(int argc, char const *argv[])
             cerr << "fatal: too few arguments from server" << endl;
             exit(1);
         }
-        string server_hostname = string(argv[1]);
         long duration = stol(test_info[1]);
-        throughput_test(client, server_hostname, duration);
+        throughput_test(client, duration);
     } else {
         cerr << "fatal: server requested invalid test type" << endl;
         exit(1);
