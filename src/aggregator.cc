@@ -111,6 +111,37 @@ void *start_senders(void *conn)
 }
 
 
+void *start_converge(void *conn)
+{
+    TCPConnection *connection = static_cast<TCPConnection *>(conn);
+    vector<string> args = connection->GetArgs();
+
+
+    long num_flows = stol(args[2]);
+    long time_per_flow_level = stol(args[3]);
+    long time_per_flow = time_per_flow_level * num_flows; 
+
+    // we should only need to lock and unlock here since each thread only modifies its own count via reference
+    pthread_mutex_lock(&flow_throughput_mutex);
+    flow_throughput.emplace(connection->GetSocket(), 0);
+    flow_previous.emplace(connection->GetSocket(), 0);
+    auto &throughput_counter = flow_throughput.at(connection->GetSocket());
+    pthread_mutex_unlock(&flow_throughput_mutex);
+
+    char *response = new char[MSG_SIZE];
+
+    string converge_message = "converge " + to_string(time_per_flow);
+
+    connection->Send(converge_message.c_str(), converge_message.size());
+
+    while (!time_expired) {
+        throughput_counter += connection->Receive(response, MSG_SIZE);
+    }
+
+    return NULL;
+}
+
+
 int query_server(int argc, char const *argv[])
 {
 
@@ -190,7 +221,7 @@ int throughput_server(int argc, char const *argv[])
     int status;
 
     if (argc < 6) {
-        cerr << "usage: aggregator throughput <num flows> <total time> <interval> <results file>" << endl;
+        cerr << "usage: aggregator converge <num flows> <total time> <interval> <results file>" << endl;
         return -1;
     }
 
@@ -238,9 +269,21 @@ int throughput_server(int argc, char const *argv[])
 
 
     // start receiving data
-    server.StartWorkers(start_senders, argv, 0);
+    server.StartWorkers(start_converge, argv, 0);
     server.WaitAll();
 
+
+    struct timespec curr_time;
+    clock_gettime(CLOCK_MONOTONIC, &curr_time);
+    long real_interval = time_diff(start_time, curr_time);
+    
+    for (auto &tp : flow_throughput) {
+        long &previous = flow_previous.at(tp.first);
+        throughput_file << flow_throughput.size() << "," << tp.first << "," << calc_throughput(start_time, curr_time, tp.second) << "," << "total" << "\n";
+        cout << "flows: " << flow_throughput.size() << " socket: " << tp.first << " throughput: " << calc_throughput(start_time, curr_time, tp.second) << " Mbits/s time: " << "total" << "\n";
+        previous = tp.second;
+    }
+    
     throughput_file.close();
 
     return 0;
@@ -254,24 +297,66 @@ int convergence_server(int argc, char const *argv[])
     string results_path;
     long num_flows;
     long delay;
-    long time_per_flow;
+    long time_per_flow_level;
     double interval;
 
+    int status;
+
     if (argc < 6) {
-        cerr << "usage: aggregator throughput <num flows> <time per flow> <interval> <results file>" << endl;
+        cerr << "usage: aggregator converge <num flows> <time per flow level> <interval> <results file>" << endl;
         return -1;
     }
 
     num_flows = strtol(argv[2], NULL, 10);
-    time_per_flow = strtol(argv[3], NULL, 10);
+    time_per_flow_level = strtol(argv[3], NULL, 10);
     interval = atof(argv[4]);
     results_path = string(argv[5]);
 
+    throughput_test_length = time_per_flow_level * (2*num_flows - 1) * USECS_PER_SEC;
+
+    throughput_file.open(results_path, ios::out | ios::app);
+
+    // we want our signal handler to have the highest possible priority
+    pthread_attr_t attr;
+    pthread_attr_init(&attr);
+    struct sched_param monitor_param;
+    monitor_param.sched_priority = 255;    
+
+    struct sigevent timer_sig;
+    timer_sig.sigev_notify = SIGEV_THREAD;
+    timer_sig.sigev_notify_function = timer_sighandler;
+    timer_sig.sigev_value.sival_int = 0;
+    timer_sig.sigev_notify_attributes = &attr;
+
+    timer_t timer_id;
+
+    status = timer_create(CLOCK_REALTIME, &timer_sig, &timer_id);
+    if (status != 0) {
+        perror("timer_create");
+        return -1;
+    }
+
+    timer_setting.it_value.tv_sec = static_cast<long>(interval * NSECS_PER_SEC) / NSECS_PER_SEC;
+    timer_setting.it_value.tv_nsec = static_cast<long>(interval * NSECS_PER_SEC) % NSECS_PER_SEC;
+    timer_setting.it_interval.tv_sec = static_cast<long>(interval * NSECS_PER_SEC) / NSECS_PER_SEC;
+    timer_setting.it_interval.tv_nsec = static_cast<long>(interval * NSECS_PER_SEC) % NSECS_PER_SEC;
+
+    // connect to clients
     for (int i = 0; i < num_flows; i++) {
         server.Accept();
     }
 
-    server.StartWorkers(start_senders, argv, time_per_flow);
+    // start the timer
+    clock_gettime(CLOCK_MONOTONIC, &start_time);
+    memcpy(&prev_time, &start_time, sizeof prev_time);
+    status = timer_settime(timer_id, 0, &timer_setting, NULL);
+
+
+    // start receiving data
+    server.StartWorkers(start_converge, argv, time_per_flow_level);
+    server.WaitAll();
+
+    throughput_file.close();
 
     return 0;
 }
