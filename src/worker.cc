@@ -35,7 +35,12 @@ int throughput_test(TCPClient &client, long duration)
 
     // start timer and do until duration expires
     while (send) {
-        client.Send(msg, MSG_SIZE);
+        try {
+            client.Send(msg, MSG_SIZE);
+        } catch (const char * e) {
+            delete msg;
+            break;
+        }
     }
 
     return 0;

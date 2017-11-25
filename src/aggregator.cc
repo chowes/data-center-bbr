@@ -20,7 +20,13 @@
 pthread_mutex_t flow_throughput_mutex = PTHREAD_MUTEX_INITIALIZER;
 unordered_map<int, long> flow_throughput;
 unordered_map<int, long> flow_previous;
+struct timespec start_time;
 struct timespec prev_time;
+
+ofstream throughput_file;
+
+long throughput_test_length;
+bool time_expired = false;
 
 struct itimerspec timer_setting;
 
@@ -97,7 +103,7 @@ void *start_senders(void *conn)
 
     connection->Send(throughput_message.c_str(), throughput_message.size());
 
-    while (true) {
+    while (!time_expired) {
         throughput_counter += connection->Receive(response, MSG_SIZE);
     }
 
@@ -159,11 +165,17 @@ void timer_sighandler(union sigval val)
     
     for (auto &tp : flow_throughput) {
         long &previous = flow_previous.at(tp.first);
-        cout << tp.first << ": " << calc_throughput(prev_time, curr_time, tp.second - previous) << " Mbits/s" << endl;
+        throughput_file << flow_throughput.size() << "," << tp.first << "," << calc_throughput(prev_time, curr_time, tp.second - previous) << "," << time_diff(start_time, curr_time) << "\n";
+        cout << "flows: " << flow_throughput.size() << " socket: " << tp.first << " throughput: " << calc_throughput(prev_time, curr_time, tp.second - previous) << " Mbits/s time: " << time_diff(start_time, curr_time) << "\n";
         previous = tp.second;
     }
     
     clock_gettime(CLOCK_MONOTONIC, &prev_time);
+
+    // hacky signal to worker threads
+    if (time_diff(start_time, prev_time) > throughput_test_length) {
+        time_expired = true;
+    }
 }
 
 
@@ -173,7 +185,6 @@ int throughput_server(int argc, char const *argv[])
     TCPServer server;
     string results_path;
     long num_flows;
-    long total_time;
     double interval;
 
     int status;
@@ -184,9 +195,11 @@ int throughput_server(int argc, char const *argv[])
     }
 
     num_flows = strtol(argv[2], NULL, 10);
-    total_time = strtol(argv[3], NULL, 10);
+    throughput_test_length = strtol(argv[3], NULL, 10) * USECS_PER_SEC;
     interval = atof(argv[4]);
     results_path = string(argv[5]);
+
+    throughput_file.open(results_path, ios::out | ios::app);
 
     // we want our signal handler to have the highest possible priority
     pthread_attr_t attr;
@@ -219,13 +232,16 @@ int throughput_server(int argc, char const *argv[])
     }
 
     // start the timer
-    clock_gettime(CLOCK_MONOTONIC, &prev_time);
+    clock_gettime(CLOCK_MONOTONIC, &start_time);
+    memcpy(&prev_time, &start_time, sizeof prev_time);
     status = timer_settime(timer_id, 0, &timer_setting, NULL);
 
 
     // start receiving data
     server.StartWorkers(start_senders, argv, 0);
     server.WaitAll();
+
+    throughput_file.close();
 
     return 0;
 }
