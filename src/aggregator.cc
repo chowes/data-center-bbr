@@ -127,8 +127,8 @@ int query_server(int argc, char const *argv[])
     results_path = string(argv[4]);
 
     for (int i = 0; i < num_workers; i++) {
-        cout << "Connected to client: " << i+1 << endl;
         server.Accept();
+        cout << "Connected to client: " << i+1 << endl;
     }
 
 
