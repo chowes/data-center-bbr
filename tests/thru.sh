@@ -9,7 +9,7 @@ filename="/home/chowes/data-center-bbr/tests/results/throughput/thru_"$cong_ctl"
 cp "/home/chowes/data-center-bbr/tests/results/throughput/thru_template.csv" $filename
 
 for (( i = 1; i <= 20; i++ )); do
-    for (( j = 0; j < 1; j++ )); do            
+    for (( j = 0; j < 100; j++ )); do            
 
 	echo "flows: $i - iter: $j"
 
