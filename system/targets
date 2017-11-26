@@ -1,6 +1,6 @@
 blue0[1-5]	target,sender
 blue00		target,receiver
-green0[0-5]	target,sender
-red0[0-5]	target,sender
-yellow0[0-5]	target,sender
+green0[0-4]	target,sender
+red0[0-4]	target,sender
+yellow0[0-4]	target,sender
 

@@ -8,8 +8,9 @@ mb_size=1048576
 for (( i = 1; i <= 20; i++ )); do
 
 	# create a results file template
-	filename="/home/chowes/data-center-bbr/results/throughput/throughput_test_"$cong_ctl"_"$i".csv"
-	cp /home/chowes/data-center-bbr/results/throughput/iperf_template.csv $filename
+	filename="/home/chowes/data-center-bbr/tests/results/throughput/throughput_test_"$cong_ctl"_"$i".csv"
+	echo $filename
+	cp /home/chowes/data-center-bbr/tests/results/throughput/iperf_template.csv $filename
 
 	# start the aggregator
 
@@ -26,8 +27,9 @@ for (( i = 1; i <= 20; i++ )); do
 
 	
 	# start the workers
-	pdsh -w $aggregator /home/chowes/data-center-bbr/aggregator throughput $i 0 30 .1 $filename
+	pdsh -w $aggregator /home/chowes/data-center-bbr/aggregator throughput $i 0 30 .1 $filename&
 	sleep 3
 	pdsh -w $worker_list /home/chowes/data-center-bbr/worker $aggregator
+	pdsh -w $aggregator pkill iperf
 	sleep 3
 done

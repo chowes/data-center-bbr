@@ -73,7 +73,7 @@ public:
      */
     int Accept();
 
-    void StartWorkers(void *(*func)(void *), const char *args[]);
+    void StartWorkers(void *(*func)(void *), const char *args[], int delay);
 
 
     /*
