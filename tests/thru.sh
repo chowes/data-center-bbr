@@ -9,12 +9,12 @@ filename="/home/chowes/data-center-bbr/tests/results/throughput/thru_"$cong_ctl"
 cp "/home/chowes/data-center-bbr/tests/results/throughput/thru_template.csv" $filename
 
 for (( i = 1; i <= 20; i++ )); do
-    for (( j = 0; j < 100; j++ )); do            
+    for (( j = 0; j < 1; j++ )); do            
 
 	echo "flows: $i - iter: $j"
 
         # start the aggregator and workers
-    	pdsh -w $aggregator /home/chowes/data-center-bbr/aggregator throughput $i $test_length $testlength $filename &
+    	pdsh -w $aggregator /home/chowes/data-center-bbr/aggregator throughput $i $test_length $test_length $filename &
     	aggregator_pid=$!
    	sleep 3
 
