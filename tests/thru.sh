@@ -11,7 +11,7 @@ cp "/home/chowes/data-center-bbr/tests/results/throughput/thru_template.csv" $fi
 for (( i = 1; i <= 20; i++ )); do
     for (( j = 0; j < 100; j++ )); do            
 
-	echo "flows: $i - iter: $j"
+	echo "flows: $i - iter: $j+1"
 
         # start the aggregator and workers
     	pdsh -w $aggregator /home/chowes/data-center-bbr/aggregator throughput $i $test_length $test_length $filename &
