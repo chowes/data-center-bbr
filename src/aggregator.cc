@@ -221,7 +221,7 @@ int throughput_server(int argc, char const *argv[])
     int status;
 
     if (argc < 6) {
-        cerr << "usage: aggregator converge <num flows> <total time> <interval> <results file>" << endl;
+        cerr << "usage: aggregator throughput <num flows> <total time> <interval> <results file>" << endl;
         return -1;
     }
 
