@@ -277,12 +277,16 @@ int throughput_server(int argc, char const *argv[])
     clock_gettime(CLOCK_MONOTONIC, &curr_time);
     long real_interval = time_diff(start_time, curr_time);
     
+    long total = 0;
     for (auto &tp : flow_throughput) {
         long &previous = flow_previous.at(tp.first);
         throughput_file << flow_throughput.size() << "," << tp.first << "," << calc_throughput(start_time, curr_time, tp.second) << "," << "total" << "\n";
         cout << "flows: " << flow_throughput.size() << " socket: " << tp.first << " throughput: " << calc_throughput(start_time, curr_time, tp.second) << " Mbits/s time: " << "total" << "\n";
-        previous = tp.second;
+        total += calc_throughput(start_time, curr_time, tp.second);
     }
+
+    throughput_file << flow_throughput.size() << "," << "all" << "," << total << "," << "total" << "\n";
+    cout << "flows: " << flow_throughput.size() << " socket: " << "all" << " throughput: " << total << " Mbits/s time: " << "total" << "\n";
     
     throughput_file.close();
 
