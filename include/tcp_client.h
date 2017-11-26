@@ -14,6 +14,7 @@
 #include <string>
 
 #define PORTNUM                     "11235"
+#define MSG_SIZE                    65536
 
 using namespace std;
 

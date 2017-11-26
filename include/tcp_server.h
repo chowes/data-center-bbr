@@ -20,6 +20,8 @@ using namespace std;
 // use this to get an OS assigned port
 #define PORTNUM                     "11235"
 #define MAX_WAITING_CLIENTS         10
+#define MSG_SIZE                    65536
+
 
 
 /*
@@ -33,6 +35,8 @@ public:
     TCPConnection(int fd, sockaddr_in addr);
     
     vector<string> GetArgs();
+
+    int GetSocket();
 
     void Start(void *(*worker_function)(void *), const char *argv[]);
 

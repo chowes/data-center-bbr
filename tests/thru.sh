@@ -3,33 +3,33 @@
 cong_ctl=$1
 
 aggregator="blue00"
-mb_size=1048576
+test_length=10
+
+filename="/home/chowes/data-center-bbr/tests/results/throughput/thru_"$cong_ctl".csv" 
+cp "/home/chowes/data-center-bbr/tests/results/throughput/thru_template.csv" $filename
 
 for (( i = 1; i <= 20; i++ )); do
+    for (( j = 0; j < 100; j++ )); do            
 
-	# create a results file template
-	filename="/home/chowes/data-center-bbr/tests/results/throughput/throughput_test_"$cong_ctl"_"$i".csv"
-	echo $filename
-	cp /home/chowes/data-center-bbr/tests/results/throughput/iperf_template.csv $filename
+	echo "flows: $i - iter: $j+1"
 
-	# start the aggregator
+        # start the aggregator and workers
+    	pdsh -w $aggregator /home/chowes/data-center-bbr/aggregator throughput $i $test_length $test_length $filename &
+    	aggregator_pid=$!
+   	sleep 3
 
+    	# start the workers
+    
+    	# read the first i worker nodes from file
+    	input="./nodes"
+    	for (( k = 1; k <= $i; k++ )); do
+            read -r line
+            worker="$line"
+            echo "starting worker: $worker"
+            pdsh -w $worker /home/chowes/data-center-bbr/worker $aggregator &
+    	done < "$input"
 
-	# build the worker list
-	worker_list=""
-	# read the first i worker nodes from file
-	input="./nodes"
-	for (( j = 1; j <= $i; j++ )); do
-		read -r line
-		worker_list+="$line"
-		worker_list+=","
-	done < "$input"
-
-	
-	# start the workers
-	pdsh -w $aggregator /home/chowes/data-center-bbr/aggregator throughput $i 0 30 .1 $filename&
-	sleep 3
-	pdsh -w $worker_list /home/chowes/data-center-bbr/worker $aggregator
-	pdsh -w $aggregator pkill iperf
-	sleep 3
+    	wait
+    	sleep 3
+    done
 done
