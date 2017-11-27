@@ -237,7 +237,7 @@ converg_graph <- function(converg_data, filename, xlim, save=FALSE) {
     labs(x = "Time (Seconds)", y = "Throughput (Mbits/Second)") +
     coord_cartesian(ylim = c(0, 1000), xlim=c(0, xlim)) +
     scale_y_continuous(expand = c(0, 0)) +
-    scale_x_continuous(breaks = seq(0, xlim, by = 30)) +
+    scale_x_continuous(breaks = seq(0, xlim, by = 60)) +
     scale_color_manual(values = c("purple", "red", "green", "blue", "black"), labels = c("Flow 1", "Flow 2", "Flow 3", "Flow 4", "Flow 5")) +
     theme_bw() + 
     theme(axis.title.y = element_text(size=20, margin = margin(0, 15, 0, 0), face="bold"),
