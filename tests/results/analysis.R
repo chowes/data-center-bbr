@@ -39,6 +39,14 @@ converge_cubic$cong_ctl <- "cubic"
 converge_data <- rbind(converge_bbr, converge_cubic)
 converge_data$socket_fd <- as.factor(converge_data$socket_fd)
 
+converge_bbr_long <- read.csv(file = "converge/bbr_converge_long.csv", header = TRUE)
+converge_cubic_long <- read.csv(file = "converge/cubic_converge_long.csv", header = TRUE)
+converge_bbr_long$cong_ctl <- "bbr" 
+converge_cubic_long$cong_ctl <- "cubic"
+
+converge_data_long <- rbind(converge_bbr_long, converge_cubic_long)
+converge_data_long$socket_fd <- as.factor(converge_data_long$socket_fd)
+
 
 query_delay_avg(subset(query_data, bg == "false"), "query_avg.pdf", 40, 15, T)
 query_delay_percentile(subset(query_data, bg == "false"), "query_percentile.pdf", 40, 15, T)
@@ -55,8 +63,12 @@ thru_cdf_graph(subset(thru_data, socket_fd == "all" & time == "total" & num_flow
 
 
 # generate convergance graph
-converg_graph(subset(converge_data, cong_ctl == "bbr"), "paper/figures/dctcp_converg.pdf", save=FALSE)
-converg_graph(subset(converge_data, cong_ctl == "cubic"), "paper/figures/reno_converg.pdf", save=FALSE)
+converg_graph(subset(converge_data, cong_ctl == "bbr"), "paper/figures/dctcp_converg.pdf", 270, save=FALSE)
+converg_graph(subset(converge_data, cong_ctl == "cubic"), "paper/figures/reno_converg.pdf", 270, save=FALSE)
+
+converg_graph(subset(converge_data_long, cong_ctl == "bbr"), "paper/figures/dctcp_converg.pdf", 540, save=FALSE)
+converg_graph(subset(converge_data_long, cong_ctl == "cubic"), "paper/figures/reno_converg.pdf", 540, save=FALSE)
+
 
 # generate throughput graph based on K, no effect after 20 so we can cut it off at k = 60
 k_throughput_graph(subset(throughput_data, k <= 30), "paper/figures/k_throughput_delay.pdf", save=TRUE)
