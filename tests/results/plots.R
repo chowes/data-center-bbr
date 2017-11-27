@@ -230,15 +230,15 @@ thru_cdf_graph <- function(data, filename, xlim, save=FALSE) {
 }
 
 
-converg_graph <- function(converg_data, filename, save=FALSE) {
+converg_graph <- function(converg_data, filename, xlim, save=FALSE) {
   
   plot <- ggplot(converg_data, aes(x=time/1000000, y=throughput, color=socket_fd)) +
     geom_line(size=1) +
     labs(x = "Time (Seconds)", y = "Throughput (Mbits/Second)") +
-    coord_cartesian(ylim = c(0, 1000), xlim=c(0, 270)) +
+    coord_cartesian(ylim = c(0, 1000), xlim=c(0, xlim)) +
     scale_y_continuous(expand = c(0, 0)) +
-    scale_x_continuous(breaks = seq(0, 270, by = 30)) +
-    # scale_color_manual(limits = c("h2", "h3", "h4", "h5", "h6"), breaks = c("h2", "h3", "h4", "h5", "h6"), values = c("purple", "red", "green", "blue", "black"), labels = c("Flow 1", "Flow 2", "Flow 3", "Flow 4", "Flow 5")) +
+    scale_x_continuous(breaks = seq(0, xlim, by = 30)) +
+    scale_color_manual(values = c("purple", "red", "green", "blue", "black"), labels = c("Flow 1", "Flow 2", "Flow 3", "Flow 4", "Flow 5")) +
     theme_bw() + 
     theme(axis.title.y = element_text(size=20, margin = margin(0, 15, 0, 0), face="bold"),
           axis.title.x = element_text(size=20, margin = margin(15, 0, 0, 0), face="bold"),
