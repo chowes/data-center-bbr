@@ -1,0 +1,85 @@
+\relax 
+\citation{alizadeh_data_2010}
+\citation{chen_understanding_2009}
+\citation{wu_ictcp:_2013}
+\citation{alizadeh_data_2010}
+\citation{chen_understanding_2009}
+\citation{alizadeh_data_2010}
+\citation{chen_understanding_2009}
+\citation{wu_ictcp:_2013}
+\citation{alizadeh_data_2010}
+\citation{alizadeh_data_2010}
+\citation{alizadeh_data_2010}
+\citation{chen_understanding_2009}
+\citation{alizadeh_data_2010}
+\citation{dean_mapreduce:_2004}
+\citation{alizadeh_data_2010}
+\citation{chiu1989analysis}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Background}{1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Data Center Workloads}{1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Performance Impairments}{1}}
+\citation{alizadeh_data_2010}
+\citation{cardwell_bbr:_2016}
+\citation{chen_understanding_2009}
+\citation{wu_ictcp:_2013}
+\citation{alizadeh_data_2010}
+\citation{alizadeh_data_2010}
+\citation{chen_understanding_2009}
+\citation{wu_ictcp:_2013}
+\citation{alizadeh_data_2010}
+\citation{wu_ictcp:_2013}
+\citation{alizadeh_data_2010}
+\citation{alizadeh_analysis_2011}
+\citation{wu_ictcp:_2013}
+\citation{cardwell_bbr:_2016}
+\citation{cardwell_tcp_2017}
+\citation{kleinrock_power_1979}
+\citation{cardwell_bbr:_2016}
+\citation{cardwell_tcp_2017}
+\citation{cardwell_bbr:_2016}
+\citation{alizadeh_data_2010}
+\citation{wu_ictcp:_2013}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.2.1}Buffer Bloat}{2}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.2.2}Incast Congestion}{2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Related Work}{2}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.3.1}DCTCP}{2}}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.3.2}ICTCP}{2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}TCP BBR}{2}}
+\citation{alizadeh_data_2010}
+\citation{wu_ictcp:_2013}
+\citation{noauthor_mellanox_sx1012}
+\citation{noauthor_mellanox_sx1012_pdf}
+\citation{iperf}
+\citation{pariag2007comparing}
+\citation{alizadeh_data_2010}
+\citation{wu_ictcp:_2013}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Experimental Design}{3}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Results}{3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Query Latency}{3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Throughput}{3}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Mean query latency $\pm $ 95 \% CI in the absence of background traffic averaged over 100 samples. Performance is similar between TCP BBR and TCP Cubic.}}{4}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces $95^{th}$ percentile of query latency in the absence of background traffic over 100 samples. Performance is similar between TCP BBR and TCP Cubic.}}{4}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces CDF of query latency in the absence of background traffic over 100 samples when querying from 20 worker nodes. Performance is similar between TCP BBR and TCP Cubic.}}{4}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Mean query latency with a single long-lived background flow $\pm $ 95 \% CI averaged over 100 samples. Mean query latency is significantly shorter for TCP BBR compared with TCP Cubic.}}{4}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces $95^{th}$ percentile of query latency with a single long-lived background flow over 100 samples. Queries are shorter when using TCP BBR than when using TCP Cubic at the $95^{th}$ percentile of query latency.}}{4}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces CDF of query latency with a single long-lived background flow over 100 samples when querying from 20 worker nodes.}}{4}}
+\citation{cardwell_bbr:_2016}
+\citation{cardwell_bbr:_2016}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces Mean throughput $\pm 95$ $\%$ CI. Throughput is negatively affected in both TCP Cubic and TCP BBR, though TCP BBR performs significantly better than TCP Cubic for $n \geq 10$.}}{5}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces CDF of throughput over 100 samples when receiving data from 20 nodes. A smaller fraction of TCP BBR flows are affected by throughput collapse compared to TCP Cubic, where less than half of transfers are able to achieve 75 \% of bottleneck bandwidth.}}{5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.3}Fairness}{5}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces TCP Cubic convergence test - 30 second intervals. TCP Cubic converges well as 5 flows are added and removed.}}{5}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces TCP BBR convergence test - 30 second intervals. TCP BBR converges poorly, and some flows starve when more than 2 flows share the bottleneck.}}{5}}
+\citation{alizadeh_data_2010}
+\citation{cardwell_bbr:_2016}
+\citation{wu_ictcp:_2013}
+\citation{alizadeh_data_2010}
+\citation{wu_ictcp:_2013}
+\citation{alizadeh_data_2010}
+\bibstyle{acm}
+\bibdata{bbr.bib}
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces TCP BBR convergence test - 60 second intervals. TCP BBR converges poorly, and connections oscillate between zero throughput and transmitting at full bottleneck speed when more than 2 flows share the link.}}{6}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Limitations}{6}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusions and Future Work}{6}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Acknowledgements}{6}}
